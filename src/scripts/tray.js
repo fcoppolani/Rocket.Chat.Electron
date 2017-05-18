@@ -24,6 +24,7 @@ const icons = {
 
 const _iconTray = path.join(__dirname, 'images', icons[process.platform].dir, icons[process.platform].icon || 'icon-tray.png');
 const _iconTrayAlert = path.join(__dirname, 'images', icons[process.platform].dir, icons[process.platform].iconAlert || 'icon-tray-alert.png');
+const _iconTBAlert = path.join(__dirname, 'images', icons[process.platform].dir, icons[process.platform].iconAlert || 'changes.png'); //#367 to add visual effect when a message is waiting
 
 function createAppTray () {
     const _tray = new Tray(_iconTray);
@@ -102,8 +103,16 @@ function showTrayAlert (showAlert, title) {
     if (mainWindow.tray === null || mainWindow.tray === undefined) {
         return;
     }
-
+    if (!mainWindow.isVisible()) { 
+        mainWindow.minimize(); //#367 to show minimized
+        mainWindow.blur(); //#367 to keep on blinking
+    }
     mainWindow.flashFrame(showAlert);
+    if (showAlert) {
+            mainWindow.setOverlayIcon(_iconTBAlert,  "unsaved changes"); //#367 to add visual effect when a message is waiting
+        } else {
+            mainWindow.setOverlayIcon(null,"saved changes"); //#367 reset visual effect
+        }
     if (process.platform !== 'darwin') {
         setImage(title);
     } else {
